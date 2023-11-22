@@ -20,5 +20,7 @@ from airports import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r'^api/airports/$', views.airports_list),
+    re_path(r'^api/airports/$', views.airports_list, name='list of airports'),
+    path('api/find_flights/', views.find_flights_between_airports,  name='find_flights'),
+    path('api/create_flight/', views.create_flight, name='create_flight'),
 ]

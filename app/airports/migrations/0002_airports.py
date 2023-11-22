@@ -7,24 +7,28 @@ def create_data(apps, schema_editor):
     Airport = apps.get_model('airports', 'Airport')
     Airport(
         airport_name="Katowice-Pyrzowice", 
+        code='KTW',
         city="Katowice", 
         country="Poland"
     ).save()
 
     Airport(
         airport_name="Krakow-Balice", 
+        code='KRK',
         city="Krakow", 
         country="Poland"
     ).save()
 
     Airport(
         airport_name="London-Heathrow", 
+        code='LHR',
         city="London", 
         country="England"
     ).save()
 
     Airport(
         airport_name="Barcelona-El Prat", 
+        code='BCN',
         city="Barcelona", 
         country="Spain"
     ).save()
