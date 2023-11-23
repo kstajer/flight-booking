@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Airport(models.Model):
     airport_id = models.AutoField(primary_key=True)
@@ -12,12 +14,13 @@ class Airport(models.Model):
 
 class Flight(models.Model):
     flight_id = models.AutoField(primary_key=True)
-    from_airport_id = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="From_Airport")
-    to_airport_id = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="To_Airport")
+    from_airport = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="From_Airport")
+    to_airport = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="To_Airport")
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
     seats = models.IntegerField(default=100)
     ticket_price = models.FloatField(default=0)
+    available_seats = models.IntegerField(default=95)
 
     class Meta:
         verbose_name_plural = "List of flights"
@@ -72,6 +75,3 @@ class Booking(models.Model):
 
     def __str__(self):
         return str(f"Flight {self.flight_id.flight_id} - {self.client_id.first_name} {self.client_id.last_name}")
-    
-    def name(self):
-        return str(f"{self.last_name}, {self.first_name} {self.middle_name}")

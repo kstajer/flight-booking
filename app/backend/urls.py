@@ -23,4 +23,10 @@ urlpatterns = [
     re_path(r'^api/airports/$', views.airports_list, name='list of airports'),
     path('api/find_flights/', views.find_flights_between_airports,  name='find_flights'),
     path('api/create_flight/', views.create_flight, name='create_flight'),
+    path('api/create_booking/', views.create_booking, name='create_booking'),
+    path('api/create_client/', views.create_client, name='create_client'),
+    path('api/create_airport/', views.create_airport, name='create_airport'),
+    path('api/bookings/', views.bookings_list, name='get_bookings'),
+    path('api/get_flight_availability/', views.get_flight_availability, name='get_flight_availability'),
 ]
+
