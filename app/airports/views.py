@@ -41,13 +41,19 @@ def find_flights_between_airports(request):
             return Response({'error': f'Required field "{field}" is missing from the request body.'}, status=status.HTTP_400_BAD_REQUEST)
     
     try:
+        from_airport_id = int(request.data['from_airport_id'])
+        to_airport_id = int(request.data['to_airport_id'])
+    except ValueError:
+        return Response({'error': 'Invalid airport ID format, must be an integer.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
         date_obj = date_parser.parse(request.data['date']).date()
     except ValueError:
         return Response({'error': 'Invalid date format, use ISO datetime format.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-    from_airport = get_object_or_404(Airport, pk=request.data['from_airport_id'])
-    to_airport = get_object_or_404(Airport, pk=request.data['to_airport_id'])
+    from_airport = get_object_or_404(Airport, pk=from_airport_id)
+    to_airport = get_object_or_404(Airport, pk=to_airport_id)
 
     flights = Flight.objects.filter(
         from_airport_id=from_airport,
