@@ -57,9 +57,16 @@ def find_flights_between_airports(request):
     )
     serializer = FlightSerializer(flights, many=True)
 
-    return Response(serializer.data)
+    data = serializer.data
+    for flight_data in data:
+        flight_data['from_airport'] = from_airport.airport_name
+        flight_data['from_airport_code'] = from_airport.code
+        flight_data['to_airport'] = to_airport.airport_name
+        flight_data['to_airport_code'] = to_airport.code
 
-@api_view(['POST'])
+    return Response(data)
+
+@api_view(['POST']) # do poprawy body -> query
 def create_flight(request):
     serializer = FlightSerializer(data=request.data)
     if serializer.is_valid():
