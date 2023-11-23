@@ -1,1 +1,4 @@
 app_venv/
+app/airports/__pycache__/
+app/airports/migrations/__pycache__/
+app/backend/__pycache__/
