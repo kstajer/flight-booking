@@ -35,22 +35,17 @@ def airports_list(request):
 
 @api_view(['GET'])
 def find_flights_between_airports(request):
-    required_fields = ['from_airport_id', 'to_airport_id', 'date']
-    for field in required_fields:
-        if field not in request.data:
-            return Response({'error': f'Required field "{field}" is missing from the request body.'}, status=status.HTTP_400_BAD_REQUEST)
-    
+    from_airport_id = request.GET.get('from_airport_id')
+    to_airport_id = request.GET.get('to_airport_id')
+    date = request.GET.get('date')
+
+    if not all([from_airport_id, to_airport_id, date]):
+        return Response({'error': 'Missing required parameters in the query.'}, status=status.HTTP_400_BAD_REQUEST)
+
     try:
-        from_airport_id = int(request.data['from_airport_id'])
-        to_airport_id = int(request.data['to_airport_id'])
-    except ValueError:
-        return Response({'error': 'Invalid airport ID format, must be an integer.'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    try:
-        date_obj = date_parser.parse(request.data['date']).date()
+        date_obj = date_parser.parse(date).date()
     except ValueError:
         return Response({'error': 'Invalid date format, use ISO datetime format.'}, status=status.HTTP_400_BAD_REQUEST)
-
 
     from_airport = get_object_or_404(Airport, pk=from_airport_id)
     to_airport = get_object_or_404(Airport, pk=to_airport_id)
