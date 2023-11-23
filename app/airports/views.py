@@ -43,7 +43,7 @@ def find_flights_between_airports(request):
         return Response({'error': 'Missing required parameters in the query.'}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        date_obj = date_parser.parse(date).date()
+        date_obj = date_parser.parse(date+"+01:00").date()
     except ValueError:
         return Response({'error': 'Invalid date format, use ISO datetime format.'}, status=status.HTTP_400_BAD_REQUEST)
 
