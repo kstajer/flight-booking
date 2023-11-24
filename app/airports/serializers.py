@@ -9,14 +9,14 @@ class AirportSerializer(serializers.ModelSerializer):
 
 
 class FlightSerializer(serializers.ModelSerializer):
-    from_airport = serializers.CharField(source='from_airport.airport_full_name', read_only=True)
+    from_airport = serializers.CharField(source='from_airport.city', read_only=True)
     from_airport_code = serializers.CharField(source='from_airport.code', read_only=True)
-    to_airport = serializers.CharField(source='to_airport.airport_full_name', read_only=True)
+    to_airport = serializers.CharField(source='to_airport.city', read_only=True)
     to_airport_code = serializers.CharField(source='to_airport.code', read_only=True)
 
     class Meta:
         model = Flight 
-        fields = ('flight_id', 'from_airport', 'from_airport_code', 'to_airport', 'to_airport_code', 'departure_time', 'arrival_time', 'seats', 'ticket_price')
+        fields = ('flight_id', 'from_airport', 'from_airport_code', 'to_airport', 'to_airport_code', 'departure_time', 'arrival_time', 'seats', 'ticket_price', 'available_seats')
 
 class ClientSerializer(serializers.ModelSerializer):
 
