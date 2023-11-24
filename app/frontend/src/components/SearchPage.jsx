@@ -1,19 +1,20 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Updated import
+import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
 import { registerLocale } from "react-datepicker";
 import pl from "date-fns/locale/pl";
 import "react-datepicker/dist/react-datepicker.css";
+import { IoIosSearch } from "react-icons/io";
 
 function SearchPage() {
   const [airports, setAirports] = useState([]);
   const [departureAirport, setDepartureAirport] = useState(null);
   const [arrivalAirport, setArrivalAirport] = useState(null);
   const [startDate, setStartDate] = useState(new Date());
-  const navigate = useNavigate(); // Updated hook
 
+  const navigate = useNavigate();
   registerLocale("pl", pl);
 
   const options = airports.map((airport) => ({
@@ -43,7 +44,7 @@ function SearchPage() {
         });
         setAirports(response.data);
       } catch (error) {
-        alert("Error. Please try again.");
+        alert("Something went wrong. Please try again.");
       }
     };
 
@@ -98,9 +99,12 @@ function SearchPage() {
 
         <button
           type="submit"
-          className="w-40 h-10 rounded-full border mt-4 border-gray-300 hover:border-gray-700 text-gray-800 focus:border-gray-300"
+          className="w-[240px] h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
         >
-          Wyszukaj loty
+          <div className="w-full h-full items-center flex justify-center">
+            <IoIosSearch className="pr-2 text-3xl" />
+            <span>Wyszukaj loty</span>
+          </div>
         </button>
       </form>
     </div>

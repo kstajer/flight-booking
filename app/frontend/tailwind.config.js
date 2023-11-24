@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       backgroundImage: {
-        "plane-bg": "url('/public/plane-background.png')",
+        "plane-bg": "url('/public/plane-background3.png')",
       },
     },
   },
