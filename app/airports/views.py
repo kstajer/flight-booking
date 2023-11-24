@@ -162,11 +162,14 @@ def create_airport(request):
 
 
 @api_view(['GET'])
-def get_flight_availability(request):
+def get_flight_details(request):
 
     flight_id = request.GET.get('flight_id')
     flight = get_object_or_404(Flight, pk=flight_id)
 
+    # airport_from = get_object_or_404(Airport, pk=flight.airport_from)
+    # airport_to = get_object_or_404(Airport, pk=flight.airport_to)
+
     serializer = FlightSerializer(flight)
 
-    return Response(serializer.data['available_seats'])
+    return Response(serializer.data)
