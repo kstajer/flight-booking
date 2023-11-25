@@ -167,9 +167,32 @@ def get_flight_details(request):
     flight_id = request.GET.get('flight_id')
     flight = get_object_or_404(Flight, pk=flight_id)
 
-    # airport_from = get_object_or_404(Airport, pk=flight.airport_from)
-    # airport_to = get_object_or_404(Airport, pk=flight.airport_to)
-
     serializer = FlightSerializer(flight)
 
     return Response(serializer.data)
+
+@api_view(['POST'])
+def confirm_booking(request):
+    booking_id = request.GET.get('booking_id')
+
+    if not booking_id:
+        return Response({'error': 'booking_id is required in the query parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    booking = get_object_or_404(Booking, pk=booking_id)
+    booking.status = '1'
+    booking.save()
+
+    return Response({'message': f'Booking with id {booking_id} confirmed.'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def cancel_booking(request):
+    booking_id = request.GET.get('booking_id')
+
+    if not booking_id:
+        return Response({'error': 'booking_id is required in the query parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    booking = get_object_or_404(Booking, pk=booking_id)
+    booking.status = '2'
+    booking.save()
+
+    return Response({'message': f'Booking with id {booking_id} cancelled.'}, status=status.HTTP_200_OK)

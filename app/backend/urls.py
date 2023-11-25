@@ -28,5 +28,7 @@ urlpatterns = [
     path('api/create_airport/', views.create_airport, name='create_airport'),
     path('api/bookings/', views.bookings_list, name='get_bookings'),
     path('api/get_flight_details/', views.get_flight_details, name='get_flight_details'),
+    path('api/confirm_booking/', views.confirm_booking, name='confirm_booking'),
+    path('api/cancel_booking/', views.cancel_booking, name='cancel_booking'),
 ]
 
