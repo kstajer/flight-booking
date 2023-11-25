@@ -10,17 +10,13 @@ import { IoIosSearch } from "react-icons/io";
 
 function SearchPage() {
   const [airports, setAirports] = useState([]);
+  const [options, setOptions] = useState([]);
   const [departureAirport, setDepartureAirport] = useState(null);
   const [arrivalAirport, setArrivalAirport] = useState(null);
   const [startDate, setStartDate] = useState(new Date());
 
   const navigate = useNavigate();
   registerLocale("pl", pl);
-
-  const options = airports.map((airport) => ({
-    value: airport.airport_id,
-    label: airport.airport_full_name,
-  }));
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,7 +36,7 @@ function SearchPage() {
       try {
         const response = await axios({
           method: "get",
-          url: "http://localhost:8000/api/airports",
+          url: "api/airports/",
         });
         setAirports(response.data);
       } catch (error) {
@@ -50,6 +46,21 @@ function SearchPage() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log("Airports:", airports);
+  
+    if (airports && Array.isArray(airports) && airports.length > 0) {
+      const airportOptions = airports.map((airport) => ({
+        value: airport.airport_id,
+        label: airport.airport_full_name,
+      }));
+  
+      setOptions(airportOptions);
+    }
+  
+  }, [airports]);
+  
   return (
     <div className="bg-white rounded-3xl w-[60%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
       <form
