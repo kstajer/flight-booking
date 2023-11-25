@@ -27,7 +27,7 @@ def update_available_seats():
             status__in=['0', '1']
             ).aggregate(
                 total_seats=models.Sum('seats')
-                )['total_seats']
+                )['total_seats'] or 0
         
-        flight.available_seats = total_reserved_seats if total_reserved_seats is not None else flight.seats
+        flight.available_seats = flight.seats - total_reserved_seats
         flight.save()
