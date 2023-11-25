@@ -5,21 +5,23 @@ import moment from "moment-with-locales-es6";
 import { MdArrowRightAlt } from "react-icons/md";
 import { LuPlaneLanding } from "react-icons/lu";
 import { LuPlaneTakeoff } from "react-icons/lu";
+import BeatLoader from "react-spinners/BeatLoader";
 
 function ResultsPage() {
   const [searchParams] = useSearchParams();
   const findFlightsParams = Object.fromEntries(searchParams);
   const [flights, setFlights] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   moment.locale("pl");
 
   const getTime = (date) => {
-    return moment(date).utcOffset(0).format("HH:mm");
+    return moment(date).format("HH:mm");
   };
 
   const getDate = (date) => {
-    return moment(date).utcOffset(0).format("D MMMM yyyy");
+    return moment(date).format("D MMMM yyyy");
   };
 
   const handleSubmit = (clickedFlightId) => {
@@ -40,6 +42,9 @@ function ResultsPage() {
           params: findFlightsParams,
         });
         setFlights(response.data);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       } catch (error) {
         alert("Something went wrong. Please try again.");
       }
@@ -48,9 +53,23 @@ function ResultsPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    console.log(loading);
+  }, [loading]);
+
   return (
     <div className="bg-white rounded-3xl w-[90%] h-fit z-20 flex flex-col items-center justify-center shadow-lg text-gray-800">
-      {flights.length > 0 ? (
+      {loading ? (
+        <div className="py-10 flex flex-col items-center justify-center gap-4">
+          <BeatLoader
+            color={"#0284be"}
+            loading={loading}
+            size={15}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </div>
+      ) : flights.length > 0 ? (
         flights.map((flight, index) => (
           <div className="w-full" key={flight.flight_id}>
             <div
