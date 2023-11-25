@@ -3,6 +3,8 @@ import SearchPage from "./components/SearchPage";
 import ResultsPage from "./components/ResultsPage";
 import ChooseSeatsPage from "./components/ChooseSeatsPage";
 import EnterDetailsPage from "./components/EnterDetailsPage";
+import NoTicketsPage from "./components/NoTicketsPage";
+import BookingSuccessfulPage from "./components/BookingSuccessfulPage";
 
 function App() {
   return (
@@ -14,6 +16,11 @@ function App() {
             <Route path="results" element={<ResultsPage />} />
             <Route path="seats" element={<ChooseSeatsPage />} />
             <Route path="details" element={<EnterDetailsPage />} />
+            <Route path="no-available-tickets" element={<NoTicketsPage />} />
+            <Route
+              path="booking-successful"
+              element={<BookingSuccessfulPage />}
+            />
           </Route>
         </Routes>
       </BrowserRouter>

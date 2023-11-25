@@ -15,6 +15,7 @@ function ChooseSeatsPage() {
   const [ticketsQuantity, setTicketsQuantity] = useState(null);
   const [availableSeats, setAvailableSeats] = useState(null);
   const [flight, setFlight] = useState();
+  const [postResponseData, setPostResponseData] = useState(null);
 
   const navigate = useNavigate();
   moment.locale("pl");
@@ -61,24 +62,39 @@ function ChooseSeatsPage() {
         method: "post",
         url: "http://localhost:8000/api/create_booking/",
         params: createBookingParams,
-      }).then((response) => {
-        console.log(response.data);
-        setFlight(response.data);
-        setAvailableSeats(response.data.available_seats);
       });
+
+      setPostResponseData(response.data);
+      setFlight(response.data);
+      setAvailableSeats(response.data.available_seats);
     } catch (error) {
       alert("Something went wrong. Please try again.");
     }
   };
 
-  const handleSubmit = () => {
-    fetchData().then(() => {
+  const handleSubmit = async () => {
+    try {
+      await fetchData();
+
       if (ticketsQuantity.value <= availableSeats) {
-        postData();
-        navigate("/details");
-      } else console.log("za malo biletow");
-    });
+        await postData();
+      } else {
+        console.log("za malo biletow");
+        navigate("/no-available-tickets");
+        return;
+      }
+    } catch (error) {
+      alert("Something went wrong. Please try again.");
+      return;
+    }
   };
+
+  useEffect(() => {
+    if (postResponseData) {
+      const queryString = new URLSearchParams(postResponseData).toString();
+      navigate(`/details?${queryString}`);
+    }
+  }, [postResponseData]);
 
   useEffect(() => {
     fetchData();

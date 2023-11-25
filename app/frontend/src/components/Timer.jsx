@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 
-const Timer = ({ booking_id }) => {
+const Timer = ({ bookingId, onTimerExpired }) => {
   const [timeLeft, setTimeLeft] = useState(360);
 
   useEffect(() => {
-    const storedBookingId = localStorage.getItem("booking_id");
+    const storedBookingId = localStorage.getItem("bookingId");
     const storedTimeLeft =
       parseInt(localStorage.getItem("timeLeft"), 10) || 360;
 
-    if (storedBookingId === `${booking_id}`) {
+    if (storedBookingId === `${bookingId}`) {
       setTimeLeft(storedTimeLeft);
     } else {
       setTimeLeft(360);
-      localStorage.setItem("booking_id", booking_id);
+      localStorage.setItem("bookingId", bookingId);
       localStorage.setItem("timeLeft", "360");
     }
 
@@ -23,14 +23,14 @@ const Timer = ({ booking_id }) => {
           return prevTime - 1;
         } else {
           clearInterval(timerInterval);
-          console.log("Timer expired!");
+          onTimerExpired();
           return 0;
         }
       });
     }, 1000);
 
     return () => clearInterval(timerInterval);
-  }, [booking_id]);
+  }, [bookingId]);
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;

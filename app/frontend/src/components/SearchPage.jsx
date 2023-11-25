@@ -40,7 +40,7 @@ function SearchPage() {
       try {
         const response = await axios({
           method: "get",
-          url: "http://localhost:8000/api/airports",
+          url: "http://localhost:8000/api/airports/",
         });
         setAirports(response.data);
       } catch (error) {
@@ -50,6 +50,10 @@ function SearchPage() {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log(airports);
+  }, [airports]);
   return (
     <div className="bg-white rounded-3xl w-[60%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
       <form
