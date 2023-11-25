@@ -15,11 +15,11 @@ function ResultsPage() {
   moment.locale("pl");
 
   const getTime = (date) => {
-    return moment(date).utcOffset(0).format("HH:mm");
+    return moment(date).format("HH:mm");
   };
 
   const getDate = (date) => {
-    return moment(date).utcOffset(0).format("D MMMM yyyy");
+    return moment(date).format("D MMMM yyyy");
   };
 
   const handleSubmit = (clickedFlightId) => {

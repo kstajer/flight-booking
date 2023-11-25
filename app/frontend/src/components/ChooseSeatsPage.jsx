@@ -20,11 +20,11 @@ function ChooseSeatsPage() {
   moment.locale("pl");
 
   const getTime = (date) => {
-    return moment(date).utcOffset(0).format("HH:mm");
+    return moment(date).format("HH:mm");
   };
 
   const getDate = (date) => {
-    return moment(date).utcOffset(0).format("D MMMM yyyy");
+    return moment(date).format("D MMMM yyyy");
   };
 
   const options = [
@@ -61,9 +61,11 @@ function ChooseSeatsPage() {
         method: "post",
         url: "http://localhost:8000/api/create_booking/",
         params: createBookingParams,
+      }).then((response) => {
+        console.log(response.data);
+        setFlight(response.data);
+        setAvailableSeats(response.data.available_seats);
       });
-      setFlight(response.data);
-      setAvailableSeats(response.data.available_seats);
     } catch (error) {
       alert("Something went wrong. Please try again.");
     }
