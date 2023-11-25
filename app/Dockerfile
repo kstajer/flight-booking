@@ -1,11 +1,18 @@
-FROM  python:3.8.13-bullseye
+FROM  python:3.9.5-alpine
 
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-RUN pip install django django-cors-headers djangorestframework python-dateutil
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
 COPY . . 
 
+COPY ./entrypoint.sh ./entrypoint.sh
+
 EXPOSE 8000
+
+RUN chmod +x entrypoint.sh
+
+CMD ["./entrypoint.sh"]
