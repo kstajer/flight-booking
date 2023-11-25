@@ -129,8 +129,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CELERY_BROKER_URL = 'redis://redis:6379/0'  
-CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
+CELERY_BROKER_URL = 'redis://localhost:6379/0'  
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -140,6 +140,10 @@ CELERY_BEAT_SCHEDULE = {
     'check-and-update-bookings': {
         'task': 'airports.tasks.check_and_update_bookings',
         'schedule': 10.0,  
+    },
+    'update-available-seats': {
+        'task': 'airports.tasks.update_available_seats',
+        'schedule': 10,  
     },
 }
 
