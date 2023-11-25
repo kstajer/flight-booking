@@ -38,7 +38,7 @@ function ResultsPage() {
       try {
         const response = await axios({
           method: "get",
-          url: "http://localhost:8000/api/find_flights",
+          url: "/api/find_flights/",
           params: findFlightsParams,
         });
         setFlights(response.data);
@@ -69,16 +69,15 @@ function ResultsPage() {
             data-testid="loader"
           />
         </div>
-      ) : flights.length > 0 ? (
+      ) : Array.isArray(flights) && flights.length > 0 ? (
         flights.map((flight, index) => (
           <div className="w-full" key={flight.flight_id}>
             <div
               key={flight.flight_id}
               className="w-full flex justify-between items-center p-8 px-12"
             >
-              <img
-                src={process.env.PUBLIC_URL + "/airline2.png"}
-                className="w-20 h-20 opacity-95"
+              <div
+                className="w-24 h-24 opacity-95 bg-airline bg-contain bg-no-repeat bg-center"
               />
               <div className="flex flex-col items-center ml-16">
                 <span className="mb-4 text-gray-600">

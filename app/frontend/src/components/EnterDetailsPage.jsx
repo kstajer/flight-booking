@@ -32,7 +32,7 @@ function EnterDetailsPage() {
 
       const response = await axios({
         method: "post",
-        url: "http://localhost:8000/api/confirm_booking/",
+        url: "/api/confirm_booking/",
         params: confirmBookingParams,
       });
     } catch (error) {
@@ -48,7 +48,7 @@ function EnterDetailsPage() {
 
       const response = await axios({
         method: "post",
-        url: "http://localhost:8000/api/cancel_booking/",
+        url: "/api/cancel_booking/",
         params: cancelBookingParams,
       });
     } catch (error) {

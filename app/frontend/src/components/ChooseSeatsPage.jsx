@@ -40,7 +40,7 @@ function ChooseSeatsPage() {
     try {
       const response = await axios({
         method: "get",
-        url: "http://localhost:8000/api/get_flight_details",
+        url: "/api/get_flight_details/",
         params: flightId,
       });
       setFlight(response.data);
@@ -60,7 +60,7 @@ function ChooseSeatsPage() {
 
       const response = await axios({
         method: "post",
-        url: "http://localhost:8000/api/create_booking/",
+        url: "/api/create_booking/",
         params: createBookingParams,
       });
 
