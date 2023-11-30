@@ -38,7 +38,8 @@ function EnterDetailsPage() {
         params: confirmBookingParams,
       });
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
     }
   };
 
@@ -55,8 +56,8 @@ function EnterDetailsPage() {
         params: cancelBookingParams,
       });
     } catch (error) {
-      console.log(error);
-      alert("Something went wrong. Please try again.");
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
     }
   };
 

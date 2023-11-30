@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import moment from "moment-with-locales-es6";
 import DatePicker from "react-datepicker";
+import { registerLocale } from "react-datepicker";
+import pl from "date-fns/locale/pl";
 import BeatLoader from "react-spinners/BeatLoader";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
@@ -13,46 +15,76 @@ function AdminDashboardPage() {
   const [flights, setFlights] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [flightDate, setFlightDate] = useState(new Date());
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  const [newFlightDate, setNewFlightDate] = useState(tomorrow);
 
   const navigate = useNavigate();
   moment.locale("pl");
+  registerLocale("pl", pl);
 
-  const listFlightsParams = {
-    from_airport_id: 1,
-    to_airport_id: 2,
-    date: new Date(2023, 11, 2).toISOString(),
+  const removeFlight = async (flightId) => {
+    try {
+      const response = await axios({
+        method: "delete",
+        baseURL: config.baseURL,
+        url: "/api/delete_flight/",
+        params: { flight_id: flightId.toString() },
+      });
+      fetchFlights();
+    } catch (error) {
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
+    }
   };
 
-  const removeFlight = (flightId) => {};
+  const modifyFlight = async (flightId, departureDate) => {
+    try {
+      const response = await axios({
+        method: "post",
+        baseURL: config.baseURL,
+        url: "/api/modify_flight/",
+        params: {
+          flight_id: flightId.toString(),
+          departure: departureDate.toISOString(),
+        },
+      });
+      setNewFlightDate(tomorrow);
+      fetchFlights();
+    } catch (error) {
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
+    }
+  };
+
+  const fetchFlights = async () => {
+    try {
+      const response = await axios({
+        method: "get",
+        baseURL: config.baseURL,
+        url: "/api/flights/",
+      });
+      setFlights(response.data);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+    } catch (error) {
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios({
-          method: "get",
-          baseURL: config.baseURL,
-          url: "/api/find_flights/",
-          params: listFlightsParams,
-        });
-        setFlights(response.data);
-        setTimeout(() => {
-          setLoading(false);
-        }, 1000);
-      } catch (error) {
-        console.log(error);
-        alert("Something went wrong. Please try again.");
-      }
-    };
-
-    fetchData();
+    fetchFlights();
   }, []);
 
   return (
     <div className="flex flex-col w-full h-full items-center">
       <button
         onClick={() => navigate("/admin/add-flight")}
-        className="w-48 h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 mb-6 border-sky-600 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
+        className="w-48 h-11 shrink-0 font-medium bg-sky-600 uppercase rounded-full border mt-4 mb-6 border-sky-600 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
       >
         Dodaj lot
       </button>
@@ -74,35 +106,37 @@ function AdminDashboardPage() {
                 <Popup
                   modal
                   trigger={
-                    <button
-                      // onClick={() => handleSubmit(flight.flight_id)}
-                      className="w-48 h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
-                    >
-                      Zmień godziny
+                    <button className="w-56 h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white">
+                      Zmień datę/godzinę
                     </button>
                   }
                   position="right center"
                 >
-                  <div className="bg-white rounded-3xl h-fit z-20 flex flex-col items-center justify-center gap-2 p-10 shadow-lg text-gray-800">
-                    <label>Nowa data/godzina lotu:</label>
-                    <DatePicker
-                      selected={flightDate}
-                      minDate={new Date()}
-                      onChange={(date) => setFlightDate(date)}
-                      showTimeSelect
-                      timeFormat="HH:mm"
-                      dateFormat="MM/dd/yyyy HH:mm"
-                      locale="pl"
-                      className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
-                      required
-                    />
-                    <button
-                      onClick={() => removeFlight(flight.flight_id)}
-                      className="w-44 h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
-                    >
-                      Potwierdź
-                    </button>
-                  </div>
+                  {(close) => (
+                    <div className="bg-white rounded-3xl h-fit z-20 flex flex-col items-center justify-center gap-2 p-10 shadow-lg text-gray-800">
+                      <label>Nowa data/godzina lotu:</label>
+                      <DatePicker
+                        selected={newFlightDate}
+                        minDate={tomorrow}
+                        onChange={(date) => setNewFlightDate(date)}
+                        showTimeSelect
+                        timeFormat="HH:mm"
+                        dateFormat="dd/MM/yyyy HH:mm"
+                        locale="pl"
+                        className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
+                        required
+                      />
+                      <button
+                        onClick={() => {
+                          modifyFlight(flight.flight_id, newFlightDate);
+                          close();
+                        }}
+                        className="w-44 h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
+                      >
+                        Potwierdź
+                      </button>
+                    </div>
+                  )}
                 </Popup>
 
                 <button

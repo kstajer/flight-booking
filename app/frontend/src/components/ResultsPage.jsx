@@ -19,14 +19,6 @@ function ResultsPage() {
   const navigate = useNavigate();
   moment.locale("pl");
 
-  const getTime = (date) => {
-    return moment(date).format("HH:mm");
-  };
-
-  const getDate = (date) => {
-    return moment(date).format("D MMMM yyyy");
-  };
-
   const handleSubmit = (clickedFlightId) => {
     const searchParams = {
       flight_id: clickedFlightId,
@@ -50,16 +42,13 @@ function ResultsPage() {
           setLoading(false);
         }, 1000);
       } catch (error) {
-        alert("Something went wrong. Please try again.");
+        alert("Coś poszło nie tak. Spróbuj ponownie później");
+        navigate("/");
       }
     };
 
     fetchData();
   }, []);
-
-  useEffect(() => {
-    console.log(loading);
-  }, [loading]);
 
   return (
     <div className="bg-white relative rounded-3xl w-[90%] h-fit z-20 flex flex-col items-center justify-center shadow-lg text-gray-800">

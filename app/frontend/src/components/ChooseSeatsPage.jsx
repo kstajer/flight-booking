@@ -48,7 +48,8 @@ function ChooseSeatsPage() {
       setFlight(response.data);
       setAvailableSeats(response.data.available_seats);
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
     }
   };
 
@@ -71,7 +72,8 @@ function ChooseSeatsPage() {
       setFlight(response.data);
       setAvailableSeats(response.data.available_seats);
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
     }
   };
 
@@ -82,12 +84,12 @@ function ChooseSeatsPage() {
       if (ticketsQuantity.value <= availableSeats) {
         await postData();
       } else {
-        console.log("za malo biletow");
         navigate("/no-available-tickets");
         return;
       }
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
       return;
     }
   };

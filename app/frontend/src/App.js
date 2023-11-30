@@ -13,7 +13,7 @@ import AddFlightPage from "./components/AddFlightPage";
 
 function App() {
   return (
-    <div className="h-screen w-screen items-center flex justify-center bg-plane-bg bg-no-repoeat bg-cover bg-fixed bg-center">
+    <div className="h-screen w-screen overflow-scroll items-center flex justify-center bg-plane-bg bg-no-repeat bg-cover bg-fixed bg-center">
       <BrowserRouter>
         <Routes>
           <Route>

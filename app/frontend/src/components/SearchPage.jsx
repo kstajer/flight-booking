@@ -15,12 +15,7 @@ function SearchPage() {
   const [departureAirport, setDepartureAirport] = useState(null);
   const [arrivalAirport, setArrivalAirport] = useState(null);
 
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-
-  const [startDate, setStartDate] = useState(tomorrow);
+  const [startDate, setStartDate] = useState(new Date());
 
   const navigate = useNavigate();
   registerLocale("pl", pl);
@@ -48,7 +43,7 @@ function SearchPage() {
         });
         setAirports(response.data);
       } catch (error) {
-        alert("Something went wrong. Please try again.");
+        alert("Coś poszło nie tak. Spróbuj ponownie później");
       }
     };
 
@@ -56,8 +51,6 @@ function SearchPage() {
   }, []);
 
   useEffect(() => {
-    console.log("Airports:", airports);
-
     if (airports && Array.isArray(airports) && airports.length > 0) {
       const airportOptions = airports.map((airport) => ({
         value: airport.airport_id,
@@ -69,63 +62,72 @@ function SearchPage() {
   }, [airports]);
 
   return (
-    <div className="bg-white rounded-3xl w-[60%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
-      <form
-        className="flex flex-col gap-8 items-center"
-        onSubmit={handleSubmit}
+    <>
+      <button
+        onClick={() => navigate("/client")}
+        className="w-[210px] h-10 absolute right-5 top-2 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-sky-600 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
       >
-        <div className="w-[350px]">
-          <label htmlFor="select1" className="text-gray-700">
-            Odlot
-          </label>
-          <Select
-            options={options}
-            name="select1"
-            placeholder="Lotnisko"
-            className="w-full"
-            onChange={setDepartureAirport}
-            required
-          />
-        </div>
-        <div className="w-[350px]">
-          <label htmlFor="select2" className="text-gray-700">
-            Przylot
-          </label>
-          <Select
-            options={options}
-            placeholder="Lotnisko"
-            name="select2"
-            className="w-full"
-            onChange={setArrivalAirport}
-            required
-          />
-        </div>
-
-        <div className="w-[350px] flex flex-col">
-          <label htmlFor="select2" className="text-gray-700">
-            Data
-          </label>
-          <DatePicker
-            selected={startDate}
-            minDate={startDate}
-            onChange={(date) => setStartDate(date)}
-            locale="pl"
-            className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          className="w-[240px] h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
+        Moje rezerwacje
+      </button>
+      <div className="bg-white rounded-3xl w-[60%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
+        <form
+          className="flex flex-col gap-8 items-center"
+          onSubmit={handleSubmit}
         >
-          <div className="w-full h-full items-center flex justify-center">
-            <IoIosSearch className="pr-2 text-3xl" />
-            <span>Wyszukaj loty</span>
+          <div className="w-[350px]">
+            <label htmlFor="select1" className="text-gray-700">
+              Odlot
+            </label>
+            <Select
+              options={options}
+              name="select1"
+              placeholder="Lotnisko"
+              className="w-full"
+              onChange={setDepartureAirport}
+              required
+            />
           </div>
-        </button>
-      </form>
-    </div>
+          <div className="w-[350px]">
+            <label htmlFor="select2" className="text-gray-700">
+              Przylot
+            </label>
+            <Select
+              options={options}
+              placeholder="Lotnisko"
+              name="select2"
+              className="w-full"
+              onChange={setArrivalAirport}
+              required
+            />
+          </div>
+
+          <div className="w-[350px] flex flex-col">
+            <label htmlFor="select2" className="text-gray-700">
+              Data
+            </label>
+            <DatePicker
+              selected={startDate}
+              minDate={new Date()}
+              onChange={(date) => setStartDate(date)}
+              dateFormat="dd/MM/yyyy"
+              locale="pl"
+              className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-[240px] h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
+          >
+            <div className="w-full h-full items-center flex justify-center">
+              <IoIosSearch className="pr-2 text-3xl" />
+              <span>Wyszukaj loty</span>
+            </div>
+          </button>
+        </form>
+      </div>
+    </>
   );
 }
 
