@@ -7,6 +7,7 @@ import { MdArrowRightAlt } from "react-icons/md";
 import { LuPlaneLanding } from "react-icons/lu";
 import { LuPlaneTakeoff } from "react-icons/lu";
 import Select from "react-select";
+import config from "../axios.config";
 
 function ChooseSeatsPage() {
   const [searchParams] = useSearchParams();
@@ -40,6 +41,7 @@ function ChooseSeatsPage() {
     try {
       const response = await axios({
         method: "get",
+        baseURL: config.baseURL,
         url: "/api/get_flight_details/",
         params: flightId,
       });
@@ -60,6 +62,7 @@ function ChooseSeatsPage() {
 
       const response = await axios({
         method: "post",
+        baseURL: config.baseURL,
         url: "/api/create_booking/",
         params: createBookingParams,
       });

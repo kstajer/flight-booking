@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ExpandingContent from "./ExpandingContent";
 import Timer from "./Timer";
+import config from "../axios.config";
 
 function EnterDetailsPage() {
   const [openIds, setOpenIds] = useState([0]);
@@ -32,6 +33,7 @@ function EnterDetailsPage() {
 
       const response = await axios({
         method: "post",
+        baseURL: config.baseURL,
         url: "/api/confirm_booking/",
         params: confirmBookingParams,
       });
@@ -48,6 +50,7 @@ function EnterDetailsPage() {
 
       const response = await axios({
         method: "post",
+        baseURL: config.baseURL,
         url: "/api/cancel_booking/",
         params: cancelBookingParams,
       });

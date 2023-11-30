@@ -8,35 +8,23 @@ import pl from "date-fns/locale/pl";
 import "react-datepicker/dist/react-datepicker.css";
 import { IoIosSearch } from "react-icons/io";
 import config from "../axios.config";
+import { startOfTomorrow } from "date-fns";
 
-function SearchPage() {
+export function AddFlightPage() {
   const [airports, setAirports] = useState([]);
   const [options, setOptions] = useState([]);
-  const [departureAirport, setDepartureAirport] = useState(null);
-  const [arrivalAirport, setArrivalAirport] = useState(null);
 
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
 
-  const [startDate, setStartDate] = useState(tomorrow);
+  const [departureAirport, setDepartureAirport] = useState(null);
+  const [arrivalAirport, setArrivalAirport] = useState(null);
+  const [flightDate, setFlightDate] = useState(tomorrow);
+  const [numberOfSeats, setNumberOfSeats] = useState(1);
 
-  const navigate = useNavigate();
-  registerLocale("pl", pl);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const searchParams = {
-      from_airport_id: departureAirport ? departureAirport.value : null,
-      to_airport_id: arrivalAirport ? arrivalAirport.value : null,
-      date: startDate.toISOString(),
-    };
-
-    const queryString = new URLSearchParams(searchParams).toString();
-    navigate(`/results?${queryString}`);
-  };
+  const addFlight = () => {};
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,8 +44,6 @@ function SearchPage() {
   }, []);
 
   useEffect(() => {
-    console.log("Airports:", airports);
-
     if (airports && Array.isArray(airports) && airports.length > 0) {
       const airportOptions = airports.map((airport) => ({
         value: airport.airport_id,
@@ -69,10 +55,10 @@ function SearchPage() {
   }, [airports]);
 
   return (
-    <div className="bg-white rounded-3xl w-[60%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
+    <div className="bg-white rounded-3xl w-[40%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
       <form
-        className="flex flex-col gap-8 items-center"
-        onSubmit={handleSubmit}
+        onSubmit={addFlight}
+        className="flex flex-col items-center gap-4 w-[50%]"
       >
         <div className="w-[350px]">
           <label htmlFor="select1" className="text-gray-700">
@@ -103,30 +89,45 @@ function SearchPage() {
 
         <div className="w-[350px] flex flex-col">
           <label htmlFor="select2" className="text-gray-700">
-            Data
+            Data i godzina wylotu
           </label>
           <DatePicker
-            selected={startDate}
-            minDate={startDate}
-            onChange={(date) => setStartDate(date)}
+            selected={flightDate}
+            minDate={flightDate}
+            onChange={(date) => setFlightDate(date)}
+            showTimeSelect
+            timeFormat="HH:mm"
+            dateFormat="MM/dd/yyyy HH:mm"
             locale="pl"
             className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
             required
           />
         </div>
 
+        <div className="w-[350px] flex flex-col">
+          <label htmlFor="select2" className="text-gray-700">
+            Ilość miejsc
+          </label>
+          <input
+            type="number"
+            min={1}
+            max={200}
+            step={1}
+            required
+            onChange={(e) => setNumberOfSeats(parseInt(e.target.value, 10))}
+            className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
+          />
+        </div>
+
         <button
           type="submit"
-          className="w-[240px] h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
+          className="w-[170px] h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-500 hover:border-2 shadow-lg text-white"
         >
-          <div className="w-full h-full items-center flex justify-center">
-            <IoIosSearch className="pr-2 text-3xl" />
-            <span>Wyszukaj loty</span>
-          </div>
+          Dodaj lot
         </button>
       </form>
     </div>
   );
 }
 
-export default SearchPage;
+export default AddFlightPage;
