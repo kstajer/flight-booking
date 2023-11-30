@@ -19,8 +19,17 @@ from django.urls import path, re_path, include
 from django.views.generic import TemplateView
 from airports import views
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from rest_framework_simplejwt import views as jwt_views
+
 
 urlpatterns = [
+    path('home/', views.HomeView.as_view(), name ='home'),
+    path('token/', 
+        jwt_views.TokenObtainPairView.as_view(), 
+        name ='token_obtain_pair'),
+    path('token/refresh/', 
+        jwt_views.TokenRefreshView.as_view(), 
+        name ='token_refresh'),
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     re_path(r'^api/airports/$', views.airports_list, name='list of airports'),
