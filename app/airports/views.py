@@ -9,6 +9,16 @@ from rest_framework import generics
 from .models import Airport, Flight, Client, Booking
 from .serializers import *
 
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+
+class HomeView(APIView):
+     
+    permission_classes = (IsAuthenticated, )
+    def get(self, request):
+        content = {'message': 'Welcome to the JWT Authentication page using React Js and Django!'}
+        return Response(content)
+
 @api_view(['GET', 'POST'])
 def airports_list(request):
     if request.method == 'GET':
