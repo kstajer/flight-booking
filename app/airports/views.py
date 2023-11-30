@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from dateutil import parser as date_parser
+from rest_framework import generics
 
 from .models import Airport, Flight, Client, Booking
 from .serializers import *
@@ -196,3 +197,84 @@ def cancel_booking(request):
     booking.save()
 
     return Response({'message': f'Booking with id {booking_id} cancelled.'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def flights_list(request):
+    flights = Flight.objects.all()
+    serializer = FlightSerializer(flights, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+def delete_flight(request):
+    try:
+        flight_id = request.GET.get('flight_id')
+        flight = get_object_or_404(Flight, pk=flight_id)
+        flight.delete()
+        return Response({'message': f'Flight with id {flight_id} deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+def delete_booking(request):
+    try:
+        booking_id = request.GET.get('booking_id')
+        booking = get_object_or_404(Booking, pk=booking_id)
+        booking.delete()
+        return Response({'message': f'Booking with id {booking_id} deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def modify_flight(request):
+    try:
+        flight_id = request.GET.get('flight_id')
+        flight = get_object_or_404(Flight, pk=flight_id)
+        departure = request.GET.get('departure')
+
+        if not departure:
+            return Response({'error': 'departure is required in the request data.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        new_departure_time = date_parser.parse(departure + "-01:00")
+        delta = flight.arrival_time - flight.departure_time
+        flight.departure_time = new_departure_time
+        flight.arrival_time = new_departure_time + delta
+        flight.save()
+
+        serializer = FlightSerializer(flight)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_bookings_for_client(request):
+    try:
+        client_id = request.GET.get('client_id')
+        client = get_object_or_404(Client, pk=client_id)
+        bookings = Booking.objects.filter(client_id=client)
+
+        booking_data = []
+
+        for booking in bookings:
+            flight_info = {
+                'departure_time': booking.flight_id.departure_time,
+                'arrival_time': booking.flight_id.arrival_time,
+                'from_airport': booking.flight_id.from_airport.airport_name,
+                'from_airport_code': booking.flight_id.from_airport.code,
+                'to_airport': booking.flight_id.to_airport.airport_name,
+                'to_airport_code': booking.flight_id.to_airport.code,
+            }
+
+            booking_data.append({
+                'booking_id': booking.booking_id,
+                'seats': booking.seats,
+                'flight_info': flight_info,
+            })
+
+        return Response(booking_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

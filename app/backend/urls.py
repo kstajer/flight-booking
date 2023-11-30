@@ -30,9 +30,14 @@ urlpatterns = [
     path('api/create_client/', views.create_client, name='create_client'),
     path('api/create_airport/', views.create_airport, name='create_airport'),
     path('api/bookings/', views.bookings_list, name='get_bookings'),
+    path('api/flights/', views.flights_list, name='get_flights'),
+    path('api/delete_flight/', views.delete_flight, name='delete_flight'),
+    path('api/delete_booking/', views.delete_booking, name='delete_booking'),
     path('api/get_flight_details/', views.get_flight_details, name='get_flight_details'),
     path('api/confirm_booking/', views.confirm_booking, name='confirm_booking'),
     path('api/cancel_booking/', views.cancel_booking, name='cancel_booking'),
+    path('api/modify_flight/', views.modify_flight, name='modify_flight'),
+    path('api/get_bookings_for_client/', views.get_bookings_for_client, name='get_bookings_for_client'),
     re_path('.*', TemplateView.as_view(template_name='index.html')),
 ]
 
