@@ -17,6 +17,11 @@ from .serializers import CustomUserSerializer
 
 from rest_framework import status
 
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 class ListUsersAPIView(APIView):
     def get(self, request, *args, **kwargs):

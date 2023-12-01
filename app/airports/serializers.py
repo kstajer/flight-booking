@@ -1,6 +1,22 @@
 from rest_framework import serializers
 from .models import Airport, Booking, Flight, CustomUser
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # You can add additional claims to the token if needed
+        # token['custom_claim'] = user.custom_attribute
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # Add user_id to the response data
+        data['user_id'] = self.user.id if self.user else None
+        return data
+
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
