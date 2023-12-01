@@ -10,21 +10,26 @@ const LoginPage = () => {
 
   const submit = async (e) => {
     e.preventDefault();
-    const user = {
-      username: username,
-      password: password,
-    };
-    const { data } = await axios.post(
-      "http://localhost:8000/token/",
-      user,
-      { headers: { "Content-Type": "application/json" } },
-      { withCredentials: true }
-    );
-
-    localStorage.clear();
-    localStorage.setItem("access_token", data.access);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${data["access"]}`;
-    window.location.href = "/";
+    try {
+      const user = {
+        username: username,
+        password: password,
+      };
+      const { data } = await axios.post(
+        "http://localhost:8000/token/",
+        user,
+        { headers: { "Content-Type": "application/json" } },
+        { withCredentials: true }
+      );
+      localStorage.clear();
+      localStorage.setItem("access_token", data.access);
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${data["access"]}`;
+      window.location.href = "/";
+    } catch (error) {
+      alert("Niepoprawne dane logowania.");
+    }
   };
 
   return (

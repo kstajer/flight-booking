@@ -1,13 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { MdKeyboardBackspace } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  let registerUser = (e) => {
-    e.preventDefault();
-  };
 
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const submit = async (e) => {
+    e.preventDefault();
+    try {
+      const user = {
+        username: username,
+        password: password,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+      };
+      const { data } = await axios.post(
+        "http://localhost:8000/register/",
+        user,
+        { headers: { "Content-Type": "application/json" } },
+        { withCredentials: true }
+      );
+      navigate("/login");
+    } catch (error) {
+      alert("Taki użytkownik już istnieje.");
+    }
+  };
   return (
     <div className="bg-white relative rounded-3xl w-[40%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
       <MdKeyboardBackspace
@@ -18,7 +43,7 @@ const RegisterPage = () => {
       />
 
       <form
-        onSubmit={registerUser}
+        onSubmit={submit}
         className="flex flex-col items-center gap-4 w-[50%]"
       >
         <input
@@ -27,6 +52,7 @@ const RegisterPage = () => {
           name="email"
           placeholder="E-mail"
           className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           required
@@ -34,6 +60,7 @@ const RegisterPage = () => {
           name="name"
           placeholder="Imię"
           className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
+          onChange={(e) => setFirstName(e.target.value)}
         />
         <input
           required
@@ -41,6 +68,7 @@ const RegisterPage = () => {
           name="lastname"
           placeholder="Nazwisko"
           className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
+          onChange={(e) => setLastName(e.target.value)}
         />
         <input
           required
@@ -48,6 +76,7 @@ const RegisterPage = () => {
           name="username"
           placeholder="Nazwa użytkownika"
           className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
+          onChange={(e) => setUsername(e.target.value)}
         />
         <input
           required
@@ -55,6 +84,7 @@ const RegisterPage = () => {
           name="password"
           placeholder="Hasło"
           className="w-full border border-gray-300 px-2 h-[40px] rounded-md text-gray-800"
+          onChange={(e) => setPassword(e.target.value)}
         />
         <button
           type="submit"
