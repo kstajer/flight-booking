@@ -2,6 +2,34 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+
+from django.contrib.auth.models import AbstractUser
+
+class CustomUser(AbstractUser):
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=30, unique=True)
+    password = models.CharField(max_length=128)
+    is_active = models.BooleanField(default=True)
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',
+        related_query_name='customuser',
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_set',
+        related_query_name='customuser',
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.username
+
+    
 class Airport(models.Model):
     airport_id = models.AutoField(primary_key=True)
     code = models.CharField("Airport code", max_length=4, default='XXX')
@@ -49,23 +77,23 @@ class Flight(models.Model):
     #         reservation = 0
     #     return self.economy_slots - reservation
 
-class Client(models.Model):
-    client_id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=250)
-    last_name = models.CharField(max_length=250)
-    email = models.EmailField(max_length=250)
+# class Client(models.Model):
+#     client_id = models.AutoField(primary_key=True)
+#     first_name = models.CharField(max_length=250)
+#     last_name = models.CharField(max_length=250)
+#     email = models.EmailField(max_length=250)
 
-    class Meta:
-        verbose_name_plural = "List of clients"
+#     class Meta:
+#         verbose_name_plural = "List of clients"
 
-    def __str__(self):
-        return str(f"{self.first_name} {self.last_name}")
+#     def __str__(self):
+#         return str(f"{self.first_name} {self.last_name}")
     
 
 class Booking(models.Model):
     booking_id = models.AutoField(primary_key=True)
     flight_id = models.ForeignKey(Flight, on_delete=models.CASCADE)
-    client_id = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     seats = models.IntegerField(default=1)
     status = models.CharField(max_length=2, choices=(('0','Booked'),('1','Confirmed'), ('2','Cancelled')), default = 0)
     booking_time = models.DateTimeField(auto_now = True)

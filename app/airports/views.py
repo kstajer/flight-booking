@@ -6,14 +6,38 @@ from rest_framework import status
 from dateutil import parser as date_parser
 from rest_framework import generics
 
-from .models import Airport, Flight, Client, Booking
+from .models import Airport, Flight, Booking
 from .serializers import *
 
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from .models import CustomUser
+from .serializers import CustomUserSerializer
+
+
+from rest_framework import status
+
+
+class ListUsersAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        users = CustomUser.objects.all()
+        serializer = CustomUserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserRegistrationAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = CustomUserSerializer(data=request.data)
+
+        if serializer.is_valid():
+            print(serializer.validated_data)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class HomeView(APIView):
-     
     permission_classes = (IsAuthenticated, )
     def get(self, request):
         content = {'message': 'Welcome to the JWT Authentication page using React Js and Django!'}
@@ -112,7 +136,7 @@ def create_booking(request):
         client_id = int(request.GET.get('client_id'))
         seats = int(request.GET.get('seats', 1))
         flight_id = get_object_or_404(Flight, pk=flight_id)
-        client_id = get_object_or_404(Client, pk=client_id)
+        client_id = get_object_or_404(CustomUser, pk=client_id)
 
         booking = Booking.objects.create(
             flight_id=flight_id,
@@ -125,24 +149,24 @@ def create_booking(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-def create_client(request):
-    try:
-        first_name = request.GET.get('first_name')
-        last_name = request.GET.get('last_name')
-        email = request.GET.get('email')
+# @api_view(['POST'])
+# def create_client(request):
+#     try:
+#         first_name = request.GET.get('first_name')
+#         last_name = request.GET.get('last_name')
+#         email = request.GET.get('email')
 
-        client = Client.objects.create(
-                first_name=first_name,
-                last_name=last_name,
-                email=email
-            )
+#         client = Client.objects.create(
+#                 first_name=first_name,
+#                 last_name=last_name,
+#                 email=email
+#             )
 
-        serializer = ClientSerializer(client)
+#         serializer = ClientSerializer(client)
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     except Exception as e:
+#         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def bookings_list(request):
@@ -264,7 +288,7 @@ def modify_flight(request):
 def get_bookings_for_client(request):
     try:
         client_id = request.GET.get('client_id')
-        client = get_object_or_404(Client, pk=client_id)
+        client = get_object_or_404(CustomUser, pk=client_id)
         bookings = Booking.objects.filter(client_id=client)
 
         booking_data = []
