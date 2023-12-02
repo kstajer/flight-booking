@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import config from "../axios.config";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -15,23 +16,32 @@ const LoginPage = () => {
         username: username,
         password: password,
       };
-      const { data } = await axios.post(
-        "token/",
-        user,
-        { headers: { "Content-Type": "application/json" } },
-        { withCredentials: true }
-      );
+    
+      const response = await axios({
+        method: "post",
+        baseURL: config.baseURL,
+        url: "token/",
+        data: user,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: false,
+      });
+    
+      const data = response.data;
+    
+      if(data.access && data.user_id){
       localStorage.clear();
       localStorage.setItem("access_token", data.access);
       localStorage.setItem("user_id", data.user_id);
-
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${data["access"]}`;
+      }
+      else alert('Coś poszło nie tak')
+      axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
       window.location.href = "/";
     } catch (error) {
       alert("Niepoprawne dane logowania.");
     }
+    
   };
 
   return (

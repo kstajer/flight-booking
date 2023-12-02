@@ -2,7 +2,7 @@
 const isProduction = true;
 
 const config = {
-  baseURL: isProduction ? "" : "http://localhost:8000",
+  baseURL: isProduction ? "http://0.0.0.0:8000" : "http://localhost:8000",
 };
 
 export default config;

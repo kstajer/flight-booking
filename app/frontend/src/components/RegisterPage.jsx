@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { MdKeyboardBackspace } from "react-icons/md";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import config from "../axios.config";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -22,17 +23,24 @@ const RegisterPage = () => {
         last_name: lastName,
         email: email,
       };
-      const { data } = await axios.post(
-        "register/",
-        user,
-        { headers: { "Content-Type": "application/json" } },
-        { withCredentials: true }
-      );
+    
+      const response = await axios({
+        method: "post",
+        baseURL: config.baseURL,
+        url: "register/",
+        data: user,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: false,
+      });
+    
       navigate("/login");
     } catch (error) {
       alert("Taki użytkownik już istnieje.");
     }
   };
+
   return (
     <div className="bg-white relative rounded-3xl w-[40%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
       <MdKeyboardBackspace

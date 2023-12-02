@@ -6,14 +6,14 @@ const Timer = ({ bookingId, onTimerExpired }) => {
   useEffect(() => {
     const storedBookingId = localStorage.getItem("bookingId");
     const storedTimeLeft =
-      parseInt(localStorage.getItem("timeLeft"), 10) || 360;
+      parseInt(localStorage.getItem("timeLeft"), 10) || 600;
 
     if (storedBookingId === `${bookingId}`) {
       setTimeLeft(storedTimeLeft);
     } else {
-      setTimeLeft(360);
+      setTimeLeft(600);
       localStorage.setItem("bookingId", bookingId);
-      localStorage.setItem("timeLeft", "360");
+      localStorage.setItem("timeLeft", "600");
     }
 
     const timerInterval = setInterval(() => {
