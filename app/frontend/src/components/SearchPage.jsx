@@ -34,6 +34,12 @@ function SearchPage() {
     navigate(`/results?${queryString}`);
   };
 
+  const onLogout = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('user_id')
+    navigate('/login')
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -78,6 +84,12 @@ function SearchPage() {
           className="w-[210px] h-10 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-sky-600 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
         >
           Moje rezerwacje
+        </button>
+        <button
+          onClick={onLogout}
+          className="w-[180px] h-10 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-sky-600 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
+        >
+          Wyloguj
         </button>
       </div>
       <div className="bg-white rounded-3xl w-[60%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">

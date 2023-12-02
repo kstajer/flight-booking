@@ -180,7 +180,8 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
+    'http://localhost:3000',
+    'http://0.0.0.0:8000'
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True 

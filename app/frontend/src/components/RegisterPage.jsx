@@ -23,7 +23,7 @@ const RegisterPage = () => {
         email: email,
       };
       const { data } = await axios.post(
-        "http://localhost:8000/register/",
+        "register/",
         user,
         { headers: { "Content-Type": "application/json" } },
         { withCredentials: true }

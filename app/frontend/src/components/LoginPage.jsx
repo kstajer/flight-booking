@@ -16,7 +16,7 @@ const LoginPage = () => {
         password: password,
       };
       const { data } = await axios.post(
-        "http://localhost:8000/token/",
+        "token/",
         user,
         { headers: { "Content-Type": "application/json" } },
         { withCredentials: true }
