@@ -14,8 +14,9 @@ function SearchPage() {
   const [options, setOptions] = useState([]);
   const [departureAirport, setDepartureAirport] = useState(null);
   const [arrivalAirport, setArrivalAirport] = useState(null);
-
   const [startDate, setStartDate] = useState(new Date());
+
+  const isAdmin = localStorage.getItem("user_id") === "1";
 
   const navigate = useNavigate();
   registerLocale("pl", pl);
@@ -63,12 +64,22 @@ function SearchPage() {
 
   return (
     <>
-      <button
-        onClick={() => navigate("/client")}
-        className="w-[210px] h-10 absolute right-5 top-2 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-sky-600 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
-      >
-        Moje rezerwacje
-      </button>
+      <div className="absolute right-5 top-2 flex gap-4">
+        {isAdmin && (
+          <button
+            onClick={() => navigate("/admin")}
+            className="w-[210px] h-10 font-medium bg-green-500 uppercase rounded-full border mt-4 border-green-500 tracking-wider hover:border-green-600 hover:border-2 shadow-lg text-white"
+          >
+            Zarządzaj lotami
+          </button>
+        )}
+        <button
+          onClick={() => navigate("/client")}
+          className="w-[210px] h-10 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-sky-600 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
+        >
+          Moje rezerwacje
+        </button>
+      </div>
       <div className="bg-white rounded-3xl w-[60%] h-fit py-12 z-20 flex flex-col items-center justify-center gap-8 shadow-lg">
         <form
           className="flex flex-col gap-8 items-center"

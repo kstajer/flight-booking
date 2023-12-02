@@ -23,6 +23,8 @@ const LoginPage = () => {
       );
       localStorage.clear();
       localStorage.setItem("access_token", data.access);
+      localStorage.setItem("user_id", data.user_id);
+
       axios.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${data["access"]}`;

@@ -13,7 +13,8 @@ import ClientDashboardPage from "./components/ClientDashboardPage";
 import AddFlightPage from "./components/AddFlightPage";
 
 function App() {
-  const [isAuth, _] = useState(localStorage.getItem("access_token"));
+  const isAuth = localStorage.getItem("access_token");
+  const isAdmin = localStorage.getItem("user_id") === "1";
 
   return (
     <div className="h-screen w-screen overflow-scroll items-center flex justify-center bg-plane-bg bg-no-repeat bg-cover bg-fixed bg-center">
@@ -26,8 +27,18 @@ function App() {
                 isAuth ? <SearchPage /> : <Navigate to="/login" replace />
               }
             />
-            <Route path="admin" element={<AdminDashboardPage />} />
-            <Route path="admin/add-flight" element={<AddFlightPage />} />
+            <Route
+              path="admin"
+              element={
+                isAdmin ? <AdminDashboardPage /> : <Navigate to="/" replace />
+              }
+            />
+            <Route
+              path="admin/add-flight"
+              element={
+                isAdmin ? <AddFlightPage /> : <Navigate to="/login" replace />
+              }
+            />
             <Route
               path="client"
               element={

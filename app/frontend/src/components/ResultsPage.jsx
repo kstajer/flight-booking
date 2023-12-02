@@ -52,12 +52,6 @@ function ResultsPage() {
 
   return (
     <div className="bg-white relative rounded-3xl w-[90%] h-fit z-20 flex flex-col items-center justify-center shadow-lg text-gray-800">
-      <MdKeyboardBackspace
-        className="absolute left-2 top-2 text-2xl cursor-pointer w-9 text-gray-400 "
-        onClick={() => {
-          navigate("/");
-        }}
-      />
       {loading ? (
         <div className="py-10 flex flex-col items-center justify-center gap-4">
           <BeatLoader
