@@ -156,24 +156,6 @@ def create_booking(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-# @api_view(['POST'])
-# def create_client(request):
-#     try:
-#         first_name = request.GET.get('first_name')
-#         last_name = request.GET.get('last_name')
-#         email = request.GET.get('email')
-
-#         client = Client.objects.create(
-#                 first_name=first_name,
-#                 last_name=last_name,
-#                 email=email
-#             )
-
-#         serializer = ClientSerializer(client)
-
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#     except Exception as e:
-#         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def bookings_list(request):
