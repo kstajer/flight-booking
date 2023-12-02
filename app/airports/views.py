@@ -118,7 +118,7 @@ def create_flight(request):
 
         departure_time_str = request.GET.get('departure_time')
 
-        departure_time = datetime.strptime(departure_time_str, "%Y-%m-%dT%H:%M:%SZ")
+        departure_time = datetime.strptime(departure_time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
         airport_from = get_object_or_404(Airport, pk=from_airport_id)
         airport_to = get_object_or_404(Airport, pk=to_airport_id)

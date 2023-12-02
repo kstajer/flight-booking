@@ -7,13 +7,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        # You can add additional claims to the token if needed
-        # token['custom_claim'] = user.custom_attribute
         return token
 
     def validate(self, attrs):
         data = super().validate(attrs)
-        # Add user_id to the response data
         data['user_id'] = self.user.id if self.user else None
         return data
 
@@ -51,12 +48,6 @@ class FlightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flight 
         fields = ('flight_id', 'from_airport', 'from_airport_code', 'to_airport', 'to_airport_code', 'departure_time', 'arrival_time', 'seats', 'ticket_price', 'available_seats')
-
-# class ClientSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         model = Client 
-#         fields = ('client_id', 'first_name', 'last_name', 'email')
 
 class BookingSerializer(serializers.ModelSerializer):
 
