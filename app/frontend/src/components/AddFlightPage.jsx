@@ -6,15 +6,14 @@ import DatePicker from "react-datepicker";
 import { registerLocale } from "react-datepicker";
 import pl from "date-fns/locale/pl";
 import "react-datepicker/dist/react-datepicker.css";
-import { IoIosSearch } from "react-icons/io";
 import config from "../axios.config";
-import { startOfTomorrow } from "date-fns";
 
 export function AddFlightPage() {
   const [airports, setAirports] = useState([]);
   const [options, setOptions] = useState([]);
 
   const navigate = useNavigate();
+  registerLocale("pl", pl);
 
   const today = new Date();
   const tomorrow = new Date(today);
@@ -39,7 +38,6 @@ export function AddFlightPage() {
           seats: numberOfSeats.toString(),
           ticket_price: ticketPrice.toString(),
           departure_time: flightDate.toISOString(),
-          arrival_time: flightDate.toISOString(),
         },
       });
     } catch (error) {
