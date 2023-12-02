@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .models import CustomUser
 from .serializers import CustomUserSerializer
-
+from datetime import datetime
 
 from rest_framework import status
 
@@ -113,9 +113,12 @@ def create_flight(request):
         to_airport_id = int(request.GET.get('to_airport_id'))
         seats = int(request.GET.get('seats', 1))
         available_seats = seats
-        departure_time = request.GET.get('departure_time')
-        arrival_time = request.GET.get('arrival_time')
         ticket_price = float(request.GET.get('ticket_price', 100))
+
+
+        departure_time_str = request.GET.get('departure_time')
+
+        departure_time = datetime.strptime(departure_time_str, "%Y-%m-%dT%H:%M:%SZ")
 
         airport_from = get_object_or_404(Airport, pk=from_airport_id)
         airport_to = get_object_or_404(Airport, pk=to_airport_id)
@@ -126,7 +129,6 @@ def create_flight(request):
             seats=seats,
             available_seats=seats,
             departure_time=departure_time,
-            arrival_time=arrival_time,
             ticket_price=ticket_price
         )
         serializer = FlightSerializer(flight)
