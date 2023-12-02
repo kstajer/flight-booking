@@ -7,6 +7,7 @@ import { MdArrowRightAlt } from "react-icons/md";
 import { LuPlaneLanding } from "react-icons/lu";
 import { LuPlaneTakeoff } from "react-icons/lu";
 import Select from "react-select";
+import config from "../axios.config";
 
 function ChooseSeatsPage() {
   const [searchParams] = useSearchParams();
@@ -15,16 +16,17 @@ function ChooseSeatsPage() {
   const [ticketsQuantity, setTicketsQuantity] = useState(null);
   const [availableSeats, setAvailableSeats] = useState(null);
   const [flight, setFlight] = useState();
+  const [postResponseData, setPostResponseData] = useState(null);
 
   const navigate = useNavigate();
   moment.locale("pl");
 
   const getTime = (date) => {
-    return moment(date).utcOffset(0).format("HH:mm");
+    return moment(date).format("HH:mm");
   };
 
   const getDate = (date) => {
-    return moment(date).utcOffset(0).format("D MMMM yyyy");
+    return moment(date).format("D MMMM yyyy");
   };
 
   const options = [
@@ -39,13 +41,15 @@ function ChooseSeatsPage() {
     try {
       const response = await axios({
         method: "get",
-        url: "http://localhost:8000/api/get_flight_details",
+        baseURL: config.baseURL,
+        url: "/api/get_flight_details/",
         params: flightId,
       });
       setFlight(response.data);
       setAvailableSeats(response.data.available_seats);
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
     }
   };
 
@@ -59,24 +63,43 @@ function ChooseSeatsPage() {
 
       const response = await axios({
         method: "post",
-        url: "http://localhost:8000/api/create_booking/",
+        baseURL: config.baseURL,
+        url: "/api/create_booking/",
         params: createBookingParams,
       });
+
+      setPostResponseData(response.data);
       setFlight(response.data);
       setAvailableSeats(response.data.available_seats);
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
     }
   };
 
-  const handleSubmit = () => {
-    fetchData().then(() => {
+  const handleSubmit = async () => {
+    try {
+      await fetchData();
+
       if (ticketsQuantity.value <= availableSeats) {
-        postData();
-        navigate("/details");
-      } else console.log("za malo biletow");
-    });
+        await postData();
+      } else {
+        navigate("/no-available-tickets");
+        return;
+      }
+    } catch (error) {
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
+      return;
+    }
   };
+
+  useEffect(() => {
+    if (postResponseData) {
+      const queryString = new URLSearchParams(postResponseData).toString();
+      navigate(`/details?${queryString}`);
+    }
+  }, [postResponseData]);
 
   useEffect(() => {
     fetchData();

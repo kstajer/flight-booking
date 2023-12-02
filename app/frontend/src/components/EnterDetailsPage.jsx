@@ -1,11 +1,19 @@
 import React, { useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 import ExpandingContent from "./ExpandingContent";
+import Timer from "./Timer";
+import config from "../axios.config";
 
 function EnterDetailsPage() {
   const [openIds, setOpenIds] = useState([0]);
   const [formData, setFormData] = useState([]);
+  const [searchParams] = useSearchParams();
+  const bookingInfo = Object.fromEntries(searchParams);
 
-  const amount = 3;
+  const amount = bookingInfo.seats;
+
+  const navigate = useNavigate();
 
   const handleToggle = (id) => {
     setOpenIds((prevOpenIds) => {
@@ -14,6 +22,50 @@ function EnterDetailsPage() {
       } else {
         return [id];
       }
+    });
+  };
+
+  const postConfirmationData = async () => {
+    try {
+      const confirmBookingParams = {
+        booking_id: bookingInfo.booking_id,
+      };
+
+      const response = await axios({
+        method: "post",
+        baseURL: config.baseURL,
+        url: "/api/confirm_booking/",
+        params: confirmBookingParams,
+      });
+    } catch (error) {
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
+    }
+  };
+
+  const postCancellationData = async () => {
+    try {
+      const cancelBookingParams = {
+        booking_id: bookingInfo.booking_id,
+      };
+
+      const response = await axios({
+        method: "post",
+        baseURL: config.baseURL,
+        url: "/api/cancel_booking/",
+        params: cancelBookingParams,
+      });
+    } catch (error) {
+      alert("Coś poszło nie tak. Spróbuj ponownie później");
+      navigate("/");
+    }
+  };
+
+  const handleFormDataChange = (id, data) => {
+    setFormData((prevFormData) => {
+      const updatedFormData = [...prevFormData];
+      updatedFormData[id] = { ...updatedFormData[id], ...data };
+      return updatedFormData;
     });
   };
 
@@ -29,22 +81,28 @@ function EnterDetailsPage() {
     }).every(Boolean);
 
     if (isFormValid) {
-      alert("Confirmation successful!");
+      postConfirmationData();
+      navigate("/booking-successful");
     } else {
       alert("Wszystkie pola muszą być wypełnione.");
     }
   };
 
-  const handleFormDataChange = (id, data) => {
-    setFormData((prevFormData) => {
-      const updatedFormData = [...prevFormData];
-      updatedFormData[id] = { ...updatedFormData[id], ...data };
-      return updatedFormData;
-    });
+  const handleCancel = () => {
+    postCancellationData();
+    navigate("/");
+  };
+
+  const handleTimerExpired = () => {
+    handleCancel();
   };
 
   return (
-    <div className="bg-white rounded-3xl w-[70%] h-fit z-20 p-12 shadow-lg flex flex-col text-gray-800">
+    <div className="bg-white rounded-3xl w-[70%] h-fit z-20 p-12 shadow-lg items-center flex flex-col text-gray-800">
+      <Timer
+        bookingId={bookingInfo.booking_id}
+        onTimerExpired={handleTimerExpired}
+      />
       <div className="border border-gray-300 rounded shadow w-[60%]">
         {Array.from({ length: amount }, (_, index) => (
           <ExpandingContent
@@ -57,7 +115,20 @@ function EnterDetailsPage() {
           />
         ))}
       </div>
-      <button onClick={handleConfirm}>Confirm</button>
+      <div className="flex">
+        <button
+          onClick={handleConfirm}
+          className="w-64 h-11 mt-8 font-medium bg-sky-600 uppercase rounded-full border border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
+        >
+          Potwierdź i kup
+        </button>
+        <button
+          onClick={handleCancel}
+          className="w-36 h-11 mt-8 ml-2 font-medium bg-gray-600 uppercase rounded-full border border-gray-300 tracking-wider hover:border-gray-800 hover:border-2 shadow-lg text-white"
+        >
+          Anuluj
+        </button>
+      </div>
     </div>
   );
 }

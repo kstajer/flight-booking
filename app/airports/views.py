@@ -4,9 +4,49 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
 from dateutil import parser as date_parser
+from rest_framework import generics
 
-from .models import Airport, Flight, Client, Booking
+from .models import Airport, Flight, Booking
 from .serializers import *
+
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from .models import CustomUser
+from .serializers import CustomUserSerializer
+from datetime import datetime
+
+from rest_framework import status
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+class ListUsersAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        users = CustomUser.objects.all()
+        serializer = CustomUserSerializer(users, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserRegistrationAPIView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = CustomUserSerializer(data=request.data)
+
+        if serializer.is_valid():
+            print(serializer.validated_data)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HomeView(APIView):
+    permission_classes = (IsAuthenticated, )
+    def get(self, request):
+        content = {'message': 'Welcome to the JWT Authentication page using React Js and Django!'}
+        return Response(content)
 
 @api_view(['GET', 'POST'])
 def airports_list(request):
@@ -73,9 +113,12 @@ def create_flight(request):
         to_airport_id = int(request.GET.get('to_airport_id'))
         seats = int(request.GET.get('seats', 1))
         available_seats = seats
-        departure_time = request.GET.get('departure_time')
-        arrival_time = request.GET.get('arrival_time')
         ticket_price = float(request.GET.get('ticket_price', 100))
+
+
+        departure_time_str = request.GET.get('departure_time')
+
+        departure_time = datetime.strptime(departure_time_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
         airport_from = get_object_or_404(Airport, pk=from_airport_id)
         airport_to = get_object_or_404(Airport, pk=to_airport_id)
@@ -86,7 +129,6 @@ def create_flight(request):
             seats=seats,
             available_seats=seats,
             departure_time=departure_time,
-            arrival_time=arrival_time,
             ticket_price=ticket_price
         )
         serializer = FlightSerializer(flight)
@@ -101,7 +143,7 @@ def create_booking(request):
         client_id = int(request.GET.get('client_id'))
         seats = int(request.GET.get('seats', 1))
         flight_id = get_object_or_404(Flight, pk=flight_id)
-        client_id = get_object_or_404(Client, pk=client_id)
+        client_id = get_object_or_404(CustomUser, pk=client_id)
 
         booking = Booking.objects.create(
             flight_id=flight_id,
@@ -114,24 +156,6 @@ def create_booking(request):
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['POST'])
-def create_client(request):
-    try:
-        first_name = request.GET.get('first_name')
-        last_name = request.GET.get('last_name')
-        email = request.GET.get('email')
-
-        client = Client.objects.create(
-                first_name=first_name,
-                last_name=last_name,
-                email=email
-            )
-
-        serializer = ClientSerializer(client)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def bookings_list(request):
@@ -167,9 +191,113 @@ def get_flight_details(request):
     flight_id = request.GET.get('flight_id')
     flight = get_object_or_404(Flight, pk=flight_id)
 
-    # airport_from = get_object_or_404(Airport, pk=flight.airport_from)
-    # airport_to = get_object_or_404(Airport, pk=flight.airport_to)
-
     serializer = FlightSerializer(flight)
 
     return Response(serializer.data)
+
+@api_view(['POST'])
+def confirm_booking(request):
+    booking_id = request.GET.get('booking_id')
+
+    if not booking_id:
+        return Response({'error': 'booking_id is required in the query parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    booking = get_object_or_404(Booking, pk=booking_id)
+    booking.status = '1'
+    booking.save()
+
+    return Response({'message': f'Booking with id {booking_id} confirmed.'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def cancel_booking(request):
+    booking_id = request.GET.get('booking_id')
+
+    if not booking_id:
+        return Response({'error': 'booking_id is required in the query parameters.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    booking = get_object_or_404(Booking, pk=booking_id)
+    booking.status = '2'
+    booking.save()
+
+    return Response({'message': f'Booking with id {booking_id} cancelled.'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def flights_list(request):
+    flights = Flight.objects.all()
+    serializer = FlightSerializer(flights, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+def delete_flight(request):
+    try:
+        flight_id = request.GET.get('flight_id')
+        flight = get_object_or_404(Flight, pk=flight_id)
+        flight.delete()
+        return Response({'message': f'Flight with id {flight_id} deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+def delete_booking(request):
+    try:
+        booking_id = request.GET.get('booking_id')
+        booking = get_object_or_404(Booking, pk=booking_id)
+        booking.delete()
+        return Response({'message': f'Booking with id {booking_id} deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def modify_flight(request):
+    try:
+        flight_id = request.GET.get('flight_id')
+        flight = get_object_or_404(Flight, pk=flight_id)
+        departure = request.GET.get('departure')
+
+        if not departure:
+            return Response({'error': 'departure is required in the request data.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        new_departure_time = date_parser.parse(departure + "-01:00")
+        delta = flight.arrival_time - flight.departure_time
+        flight.departure_time = new_departure_time
+        flight.arrival_time = new_departure_time + delta
+        flight.save()
+
+        serializer = FlightSerializer(flight)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def get_bookings_for_client(request):
+    try:
+        client_id = request.GET.get('client_id')
+        client = get_object_or_404(CustomUser, pk=client_id)
+        bookings = Booking.objects.filter(client_id=client)
+
+        booking_data = []
+
+        for booking in bookings:
+            flight_info = {
+                'departure_time': booking.flight_id.departure_time,
+                'arrival_time': booking.flight_id.arrival_time,
+                'from_airport': booking.flight_id.from_airport.airport_name,
+                'from_airport_code': booking.flight_id.from_airport.code,
+                'to_airport': booking.flight_id.to_airport.airport_name,
+                'to_airport_code': booking.flight_id.to_airport.code,
+            }
+
+            booking_data.append({
+                'booking_id': booking.booking_id,
+                'seats': booking.seats,
+                'flight_info': flight_info,
+            })
+
+        return Response(booking_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

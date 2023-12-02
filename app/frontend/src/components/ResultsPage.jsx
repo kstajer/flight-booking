@@ -5,22 +5,19 @@ import moment from "moment-with-locales-es6";
 import { MdArrowRightAlt } from "react-icons/md";
 import { LuPlaneLanding } from "react-icons/lu";
 import { LuPlaneTakeoff } from "react-icons/lu";
+import BeatLoader from "react-spinners/BeatLoader";
+import { MdKeyboardBackspace } from "react-icons/md";
+import config from "../axios.config";
+import FlightsList from "./FlightsList";
 
 function ResultsPage() {
   const [searchParams] = useSearchParams();
   const findFlightsParams = Object.fromEntries(searchParams);
   const [flights, setFlights] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
   moment.locale("pl");
-
-  const getTime = (date) => {
-    return moment(date).utcOffset(0).format("HH:mm");
-  };
-
-  const getDate = (date) => {
-    return moment(date).utcOffset(0).format("D MMMM yyyy");
-  };
 
   const handleSubmit = (clickedFlightId) => {
     const searchParams = {
@@ -36,12 +33,17 @@ function ResultsPage() {
       try {
         const response = await axios({
           method: "get",
-          url: "http://localhost:8000/api/find_flights",
+          baseURL: config.baseURL,
+          url: "/api/find_flights/",
           params: findFlightsParams,
         });
         setFlights(response.data);
+        setTimeout(() => {
+          setLoading(false);
+        }, 1000);
       } catch (error) {
-        alert("Something went wrong. Please try again.");
+        alert("Coś poszło nie tak. Spróbuj ponownie później");
+        navigate("/");
       }
     };
 
@@ -49,48 +51,28 @@ function ResultsPage() {
   }, []);
 
   return (
-    <div className="bg-white rounded-3xl w-[90%] h-fit z-20 flex flex-col items-center justify-center shadow-lg text-gray-800">
-      {flights.length > 0 ? (
-        flights.map((flight, index) => (
-          <div className="w-full" key={flight.flight_id}>
-            <div
-              key={flight.flight_id}
-              className="w-full flex justify-between items-center p-8 px-12"
+    <div className="bg-white relative rounded-3xl w-[90%] h-fit z-20 flex flex-col items-center justify-center shadow-lg text-gray-800">
+      {loading ? (
+        <div className="py-10 flex flex-col items-center justify-center gap-4">
+          <BeatLoader
+            color={"#0284be"}
+            loading={loading}
+            size={15}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </div>
+      ) : Array.isArray(flights) && flights.length > 0 ? (
+        <FlightsList flights={flights}>
+          {(flight) => (
+            <button
+              onClick={() => handleSubmit(flight.flight_id)}
+              className="w-44 h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
             >
-              <img
-                src={process.env.PUBLIC_URL + "/airline2.png"}
-                className="w-20 h-20 opacity-95"
-              />
-              <div className="flex flex-col items-center ml-16">
-                <span className="mb-4 text-gray-600">
-                  {getDate(flight.departure_time)}
-                </span>
-                <div className="w-full flex text-3xl gap-6 justify-center items-center">
-                  <LuPlaneTakeoff className="text-gray-300 text-xl" />
-                  <span className="text-xl">
-                    {getTime(flight.departure_time)}
-                  </span>
-                  <span>{flight.from_airport_code}</span>
-                  <MdArrowRightAlt />
-                  <span>{flight.to_airport_code}</span>
-                  <span className="text-xl">
-                    {getTime(flight.arrival_time)}
-                  </span>
-                  <LuPlaneLanding className="text-gray-300 text-xl" />
-                </div>
-              </div>
-              <button
-                onClick={() => handleSubmit(flight.flight_id)}
-                className="w-44 h-11 font-medium bg-sky-600 uppercase rounded-full border mt-4 border-gray-300 tracking-wider hover:border-sky-800 hover:border-2 shadow-lg text-white"
-              >
-                Wybierz
-              </button>
-            </div>
-            {index !== flights.length - 1 && (
-              <hr className="text-gray-300 w-full" />
-            )}
-          </div>
-        ))
+              Wybierz
+            </button>
+          )}
+        </FlightsList>
       ) : (
         <div className="h-40 p-4 flex flex-col items-center justify-center gap-4">
           <span className="text-lg">

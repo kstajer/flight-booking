@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { IoChevronDown } from "react-icons/io5";
 
-function ExpandingContent({ id, open, onToggle, formData, onFormDataChange }) {
+function ExpandingContent({ id, open, onToggle, onFormDataChange }) {
   const [localFormData, setLocalFormData] = useState({
     name: "",
     surname: "",
