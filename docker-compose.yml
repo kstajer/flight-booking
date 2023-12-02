@@ -14,6 +14,7 @@ services:
       - redis
       - celery
       - celery-beat
+      - frontend
 
   frontend:
     build: ./app/frontend
