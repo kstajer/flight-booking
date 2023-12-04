@@ -134,6 +134,8 @@ def create_flight(request):
         serializer = FlightSerializer(flight)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     except Exception as e:
+        if str(e) == 'No Airport matches the given query.':
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -144,7 +146,7 @@ def create_booking(request):
         seats = int(request.GET.get('seats', 1))
         flight_id = get_object_or_404(Flight, pk=flight_id)
         client_id = get_object_or_404(CustomUser, pk=client_id)
-
+        
         booking = Booking.objects.create(
             flight_id=flight_id,
             client_id=client_id,
@@ -154,6 +156,8 @@ def create_booking(request):
         serializer = BookingSerializer(booking)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     except Exception as e:
+        if str(e) == 'No Flight matches the given query.' or str(e) == 'No CustomUser matches the given query.' :
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -187,11 +191,16 @@ def create_airport(request):
 
 @api_view(['GET'])
 def get_flight_details(request):
+    try:
+        flight_id = request.GET.get('flight_id')
+        flight = get_object_or_404(Flight, pk=flight_id)
 
-    flight_id = request.GET.get('flight_id')
-    flight = get_object_or_404(Flight, pk=flight_id)
+        serializer = FlightSerializer(flight)
 
-    serializer = FlightSerializer(flight)
+    except Exception as e:
+        if str(e) == 'No Flight matches the given query.':
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     return Response(serializer.data)
 
@@ -237,6 +246,8 @@ def delete_flight(request):
         flight.delete()
         return Response({'message': f'Flight with id {flight_id} deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
+        if str(e) == 'No Flight matches the given query.':
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -248,6 +259,8 @@ def delete_booking(request):
         booking.delete()
         return Response({'message': f'Booking with id {booking_id} deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
     except Exception as e:
+        if str(e) == 'No Booking matches the given query.':
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -270,6 +283,8 @@ def modify_flight(request):
         serializer = FlightSerializer(flight)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
+        if str(e) == 'No Flight matches the given query.':
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -300,4 +315,6 @@ def get_bookings_for_client(request):
 
         return Response(booking_data, status=status.HTTP_200_OK)
     except Exception as e:
+        if str(e) == 'No CustomUser matches the given query.':
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
